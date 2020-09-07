@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import padStart from 'lodash/padStart';
 
+import Icon from 'react-native-vector-icons/Ionicons';
+
 export default class VideoPlayer extends Component {
   static defaultProps = {
     toggleResizeModeOnFullscreen: true,
@@ -51,7 +53,7 @@ export default class VideoPlayer extends Component {
 
       isFullscreen:
         this.props.isFullScreen || this.props.resizeMode === 'cover' || false,
-      showTimeRemaining: true,
+      showTimeRemaining: false,
       volumeTrackWidth: 0,
       volumeFillWidth: 0,
       seekerFillWidth: 0,
@@ -538,7 +540,11 @@ export default class VideoPlayer extends Component {
       return `-${this.formatTime(time)}`;
     }
 
-    return this.formatTime(this.state.currentTime);
+    return (
+      this.formatTime(this.state.currentTime) +
+      ' / ' +
+      this.formatTime(this.state.duration)
+    );
   }
 
   /**
@@ -1061,7 +1067,7 @@ export default class VideoPlayer extends Component {
         {...this.player.seekPanResponder.panHandlers}>
         <View
           style={styles.seekbar.track}
-          onLayout={event =>
+          onLayout={(event) =>
             (this.player.seekerWidth = event.nativeEvent.layout.width)
           }
           pointerEvents={'none'}>
@@ -1095,12 +1101,14 @@ export default class VideoPlayer extends Component {
    * Render the play/pause button and show the respective icon
    */
   renderPlayPause() {
-    let source =
-      this.state.paused === true
-        ? require('./assets/img/play.png')
-        : require('./assets/img/pause.png');
+    let play = <Icon name={'play'} size={32} color={'#fff'} />;
+
+    let pause = <Icon name={'pause'} size={32} color={'#fff'} />;
+
+    let source = this.state.paused === true ? play : pause;
+
     return this.renderControl(
-      <Image source={source} />,
+      source,
       this.methods.togglePlayPause,
       styles.controls.playPause,
     );
@@ -1191,7 +1199,7 @@ export default class VideoPlayer extends Component {
         <View style={[styles.player.container, this.styles.containerStyle]}>
           <Video
             {...this.props}
-            ref={videoPlayer => (this.player.ref = videoPlayer)}
+            ref={(videoPlayer) => (this.player.ref = videoPlayer)}
             resizeMode={this.state.resizeMode}
             volume={this.state.volume}
             paused={this.state.paused}
@@ -1336,7 +1344,7 @@ const styles = {
     },
     playPause: {
       position: 'relative',
-      width: 80,
+      width: 'auto',
       zIndex: 0,
     },
     title: {
@@ -1347,14 +1355,15 @@ const styles = {
     },
     titleText: {
       textAlign: 'center',
+      fontSize: 14,
     },
     timer: {
-      width: 80,
+      width: 'auto',
     },
     timerText: {
       backgroundColor: 'transparent',
       color: '#FFF',
-      fontSize: 11,
+      fontSize: 14,
       textAlign: 'right',
     },
   }),
@@ -1390,35 +1399,38 @@ const styles = {
   seekbar: StyleSheet.create({
     container: {
       alignSelf: 'stretch',
-      height: 28,
+      height: 40,
       marginLeft: 20,
       marginRight: 20,
     },
     track: {
+      borderWidth: 1,
+      borderColor: '#333',
       backgroundColor: '#333',
-      height: 1,
+      height: 6,
       position: 'relative',
-      top: 14,
+      top: 18,
       width: '100%',
     },
     fill: {
       backgroundColor: '#FFF',
-      height: 1,
+      height: 4,
       width: '100%',
     },
     handle: {
       position: 'absolute',
-      marginLeft: -7,
-      height: 28,
-      width: 28,
+      marginLeft: -14,
+      height: 40,
+      width: 40,
     },
     circle: {
-      borderRadius: 12,
+      borderRadius: 18,
       position: 'relative',
-      top: 8,
-      left: 8,
-      height: 12,
-      width: 12,
+      top: 12,
+      left: 12,
+      height: 18,
+      width: 18,
+      borderWidth: 1,
     },
   }),
 };
